@@ -36,14 +36,9 @@ ThreadPool::ThreadPool(size_t threads)
 
 void ThreadPool::enqueue(Task&& task) {
 
-    std::cout << "hello world.\n";
+    std::cout << "push a task.\n";
     std::unique_lock<std::mutex> lock{m_queueMutex};
-    m_cv.wait(lock, [this](){
-        return stop || !(m_tasks.empty());
-    });
-
     m_tasks.emplace(task);
-
     lock.unlock();
     m_cv.notify_one();
 
