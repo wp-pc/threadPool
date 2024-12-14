@@ -1,5 +1,5 @@
 #include <iostream>
-
+#include <ctime>
 #include "threadPool.h"
 
 void fun(int a) {
@@ -19,6 +19,8 @@ int main() {
             // std::this_thread::sleep_for(std::chrono::milliseconds(1000));
         }
     });
+
+    // while(1){}
     pool.enqueue([]() {
         while(1) {
             std::cout << "Thread 2" << std::endl;

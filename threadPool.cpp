@@ -35,18 +35,23 @@ ThreadPool::ThreadPool(size_t threads)
 
 
 void ThreadPool::enqueue(Task&& task) {
-
     std::cout << "push a task.\n";
     std::unique_lock<std::mutex> lock{m_queueMutex};
+
+    if(stop) {
+        throw std::runtime_error("the threadPool is stopped. ");
+    }
+    
     m_tasks.emplace(task);
     lock.unlock();
     m_cv.notify_one();
-
 }
 
-
-
-
 ThreadPool::~ThreadPool() {
+    std::unique_lock<std::mutex> lock(m_queueMutex);
     stop = true;
+    lock.unlock();
+    for(auto& t : m_workers) {
+        t.join();
+    }
 }
