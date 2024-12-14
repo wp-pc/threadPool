@@ -2,9 +2,6 @@
 
 #include <iostream>
 
-
-
-
 ThreadPool::ThreadPool(size_t threads) 
     :stop(false)
 {
@@ -33,25 +30,27 @@ ThreadPool::ThreadPool(size_t threads)
     }
 }
 
+// push a task to taskQueue
+// template<class F, class... Args>
+// void ThreadPool::enqueue(F&& f, Args&&... args) {
+//     std::cout << "push a task.\n";
+//     auto task = std::bind(std::forward<F>(f), std::forward<Args>(args)...);
+//     std::unique_lock<std::mutex> lock{m_queueMutex};
+//     if(stop) {
+//         throw std::runtime_error("the threadPool is stopped. ");
+//     }
+//     m_tasks.emplace(task);
+//     lock.unlock();
+//     m_cv.notify_one();
+// }
 
-void ThreadPool::enqueue(Task&& task) {
-    std::cout << "push a task.\n";
-    std::unique_lock<std::mutex> lock{m_queueMutex};
-
-    if(stop) {
-        throw std::runtime_error("the threadPool is stopped. ");
-    }
-    
-    m_tasks.emplace(task);
-    lock.unlock();
-    m_cv.notify_one();
-}
 
 ThreadPool::~ThreadPool() {
     std::unique_lock<std::mutex> lock(m_queueMutex);
     stop = true;
     lock.unlock();
     for(auto& t : m_workers) {
-        t.join();
+        if(t.joinable())
+            t.join();
     }
 }
