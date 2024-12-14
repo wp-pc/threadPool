@@ -15,15 +15,14 @@ class ThreadPool
 public:
     explicit ThreadPool(size_t threads);
 
-    template <class F, class... Args>
-
     // add task for work_queue
+    template <class F, class... Args>
     inline void enqueue(F &&f, Args &&...args)
     {
         std::cout << "push a task.\n";
         auto task = std::bind(std::forward<F>(f), std::forward<Args>(args)...);
         std::unique_lock<std::mutex> lock{m_queueMutex};
-        if (stop)
+        if (m_stop)
         {
             throw std::runtime_error("the threadPool is stopped.");
             // throw std::runtime_error("the threadPool is stopped. ");
@@ -33,8 +32,8 @@ public:
         m_cv.notify_one();
     }
 
-    // stop the thread_pool
-    // void stop();
+    // m_stop the thread_pool
+    void stop();
     ~ThreadPool();
 
 private:
@@ -42,7 +41,11 @@ private:
     std::queue<Task> m_tasks;
     std::mutex m_queueMutex;
     std::condition_variable m_cv;
-    bool stop;
+    std::thread m_mangerThead;
+    bool m_stop;
+    
+private:
+    void executeManger();
 };
 
 #endif
