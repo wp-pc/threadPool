@@ -4,6 +4,6 @@ project(threadPool)
 
 
 add_executable(threadPool 
-    threadPool.h threadPool.cpp
+    threadPool.hpp
     ./example/main.cpp
 )

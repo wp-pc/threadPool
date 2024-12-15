@@ -1,6 +1,8 @@
 #include <iostream>
 #include <ctime>
-#include "../threadPool.h"
+#include <type_traits>
+
+#include "../threadPool.hpp"
 
 void fun(int a) {
     while(1) {
@@ -19,9 +21,15 @@ public:
         }
     }
 };
+
+// void fun() {
+
+// }
 int main() {
 
+
     std::cout << "Starting the proess. " << std::endl;
+    std::cout << typeid(int).name() << std::endl;
     ThreadPool pool(4);
 
     pool.enqueue([]() {
@@ -41,3 +49,4 @@ int main() {
     pool.enqueue(fun, 3);
     pool.enqueue(A());
 }
+
